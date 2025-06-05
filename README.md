@@ -1,11 +1,11 @@
 # 🔧 System Monitoring Dashboard
 
 A lightweight, modern and responsive system monitoring dashboard (inspired by Turing Smart Screen) built with:
+
 - 🐍 Python (`psutil`, `Flask`)
 - 📊 Chart.js for visualizing CPU, RAM, SWAP, network and battery data
 - ☁️ Weather & time widgets
 - 🌐 Web-based frontend, runs on any modern browser
-
 
 ## 🚀 Features
 
@@ -16,21 +16,19 @@ A lightweight, modern and responsive system monitoring dashboard (inspired by Tu
 - **Responsive dark mode layout**
 - **Portable**: Runs on macOS (tested), Linux (not tested yet), Raspberry Pi (not tested yet) & Windows (not tested yet)
 
-
 ## 🖥️ Preview
 
 ![Screenshot](media/preview.png)
-
 
 ## 🔧 Requirements
 
 - Python 3.7+
 - pip (Python package manager)
 
-
 ## 📦 Installation
 
 ### **1. Clone the Repository**
+
 ```bash
 git clone https://github.com/abz89/sysmon.git
 cd sysmon
@@ -39,23 +37,26 @@ cd sysmon
 ### **2. Create a Virtual Environment**
 
 #### **On macOS/Linux:**
+
 ```bash
 python3 -m venv venv  # Create virtual environment
 source venv/bin/activate  # Activate the virtual environment
 ```
 
 #### **On Windows:**
+
 ```bash
 python -m venv venv  # Create virtual environment
 .\venv\Scripts\activate  # Activate the virtual environment
 ```
 
 ### **3. Install Dependencies**
+
 Make sure you have a `requirements.txt` file in your repository. Install the required Python packages with:
+
 ```bash
 pip install -r requirements.txt
 ```
-
 
 ## 🧪 Usage
 
@@ -78,8 +79,8 @@ python systems_monitoring.py --mode frontend --api-host <API_HOST> --api-port <A
 ```bash
 python systems_monitoring.py --mode both --port 8000
 ```
-Then open: [http://localhost:8000](http://localhost:8000)
 
+Then open: [http://localhost:8000](http://localhost:8000)
 
 ## ⚙️ Configuration
 
@@ -87,32 +88,29 @@ Then open: [http://localhost:8000](http://localhost:8000)
 - Chart update interval can be changed via `setInterval()` in JS
 - Responsive layout based on Bootstrap 5 grid
 
-
 ## 📁 File Structure
-```
 
-└── LICENSE					
+```
+└── LICENSE
 ├── media/
 │   ├── preview.png
-└── README.md						# this document
+└── README.md					# this document
 ├── requirements.txt     		# Python dependencies
 ├── static/
 │   ├── index.html       		# Main dashboard UI
 ├── systems_monitoring.py		# Backend API server using Flask
 ```
 
-
 ## 📜 License
 
 This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
-
 
 ## 🤝 Contributing
 
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change or improve.
 
-
 ## ❤️ Acknowledgments
+
 - [psutil](https://github.com/giampaolo/psutil)
 - [Chart.js](https://www.chartjs.org/)
 - [Bootstrap 5](https://getbootstrap.com/)
