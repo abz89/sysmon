@@ -1,0 +1,747 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>System Dashboard</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      body {
+        background-color: #121212;
+        color: #ffffff;
+        font-family: "Inter", sans-serif;
+        height: 100vh;
+        margin: 0;
+        padding: 10px;
+      }
+
+      .container-fluid {
+        border: 1px solid #2a2a2a;
+        border-radius: 12px;
+        padding: 12px;
+      }
+
+      .widget {
+        background-color: #1e1e1e;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.03);
+        height: 100%;
+      }
+
+      .widget h5 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .flip-clock-wrapper {
+        transform: scale(0.7);
+        -webkit-transform: scale(0.7);
+        transform-origin: top left;
+        margin-top: -10px;
+      }
+
+      .flip-clock-wrapper ul li a div div.inn {
+        color: #fff;
+        background-color: #333;
+      }
+
+      #clock {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #ffffff;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+      }
+
+      .weather-icon {
+        width: 48px;
+        vertical-align: middle;
+        margin-right: 10px;
+      }
+
+      .progress-bar {
+        transition: width 0.6s ease;
+      }
+
+      table td,
+      table th {
+        background-color: #1e1e1e !important;
+        font-size: 0.85rem;
+      }
+
+      #ram-usage-total,
+      #disk-free-total,
+      #swap-usage-total {
+        text-align: right;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container-fluid">
+      <div class="row g-2">
+        <!-- System Info -->
+        <div class="col-4">
+          <div class="widget">
+            <h5>
+              <img src="https://img.icons8.com/fluency/24/gear.png" />
+              System Info
+            </h5>
+            <table class="table table-dark table-sm table-borderless mb-0">
+              <tr>
+                <th>Kernel</th>
+                <td>
+                  <span id="kernel-info">Loading</span>
+                </td>
+              </tr>
+              <tr>
+                <th>Uptime</th>
+                <td>
+                  <span id="uptime">Loading</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Time  -->
+        <div class="col-4">
+          <div class="widget">
+            <h5>
+              <img src="https://img.icons8.com/fluency/24/clock.png" />
+              Time
+            </h5>
+            <table class="table table-dark table-sm table-borderless mb-0">
+              <tr>
+                <td class="text-center">
+                  <div id="date">-----, ---- --, ----</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="text-center">
+                  <div id="clock" style="font-size: 2rem; font-weight: bold">
+                    --:--:-- --
+                  </div>
+                </td>
+              </tr>
+            </table>
+            <br />
+          </div>
+        </div>
+
+        <!-- Weather -->
+        <div class="col-4">
+          <div class="widget">
+            <h5>
+              <img src="https://img.icons8.com/fluency/24/cloud.png" />
+              Weather
+            </h5>
+            <table class="table table-dark table-sm table-borderless mb-0">
+              <tr>
+                <td>
+                  <div id="weather-location" style="font-weight: bold">
+                    Finding location...
+                  </div>
+                </td>
+                <td rowspan="2" class="text-center align-middle">
+                  <img
+                    id="weather-icon"
+                    class="weather-icon"
+                    src=""
+                    alt="Weather icon"
+                    style="display: none"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <span id="weather-text"> Loading... </span>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Processes & Power -->
+        <div class="col-4">
+          <div class="widget">
+            <h5>
+              <img src="https://img.icons8.com/fluency/24/task.png" />
+              Processes & Power
+            </h5>
+            <div class="row" style="height: 100%">
+              <div class="col-6 d-flex flex-column flex-grow-1">
+                <div>
+                  <table
+                    class="table table-dark table-sm table-borderless mb-0"
+                    id="process-table"
+                  >
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th class="text-center">PID</th>
+                        <th class="text-center">CPU%</th>
+                        <th class="text-center">RAM%</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td
+                          colspan="4"
+                          class="text-center"
+                          style="height: 140px; vertical-align: middle"
+                        >
+                          Loading Processes...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="flex-fill d-flex align-items-center mt-2">
+                  <div class="flex-grow-1">
+                    <table
+                      class="table table-dark table-sm table-borderless mb-0"
+                    >
+                      <tr>
+                        <td>
+                          <div id="battery-text">---</div>
+                        </td>
+                        <td
+                          rowspan="2"
+                          class="text-center align-middle"
+                          style="width: 100px"
+                        >
+                          <div
+                            id="battery-icon-container"
+                            style="
+                              position: relative;
+                              width: 40px;
+                              height: 20px;
+                              border: 2px solid #fff;
+                              border-radius: 4px;
+                              display: flex;
+                              align-items: center;
+                              justify-content: flex-start;
+                              margin: auto;
+                            "
+                          >
+                            <div
+                              id="battery-fill"
+                              style="
+                                background-color: #00ff5e;
+                                height: 100%;
+                                width: 0%;
+                                border-radius: 2px;
+                              "
+                            ></div>
+                            <div
+                              style="
+                                position: absolute;
+                                right: -6px;
+                                top: 25%;
+                                width: 4px;
+                                height: 50%;
+                                background: #fff;
+                                border-radius: 1px;
+                              "
+                            ></div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <small id="battery-status">-----</small>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resource Usage -->
+        <div class="col-8">
+          <div class="widget">
+            <h5>
+              <img src="https://img.icons8.com/fluency/24/processor.png" />
+              Resource Usage
+            </h5>
+            <div class="row" style="height: 100%">
+              <div class="col-6">
+                <canvas id="resource-usage-arc"></canvas>
+              </div>
+              <div class="col-6 d-flex flex-column flex-grow-1">
+                <div>
+                  <table
+                    class="table table-dark table-sm table-borderless mb-0 h-100"
+                  >
+                    <tr>
+                      <th>RAM Usage</th>
+                      <td id="ram-usage-total">Loading</td>
+                    </tr>
+                    <tr>
+                      <th>Swap Usage</th>
+                      <td id="swap-usage-total">Loading</td>
+                    </tr>
+                    <tr>
+                      <th>Free Space</th>
+                      <td id="disk-free-total">Loading</td>
+                    </tr>
+                  </table>
+                </div>
+                <div class="flex-fill d-flex align-items-center mt-2">
+                  <div class="flex-grow-1">
+                    <canvas
+                      id="network-history"
+                      height="100"
+                      style="width: 100%; height: 100px"
+                    ></canvas>
+                  </div>
+                  <div
+                    class="ps-3"
+                    style="width: 120px; text-align: right; font-size: 0.85rem"
+                  >
+                    down
+                    <span id="download-speed">-</span>
+                    <br />
+                    up
+                    <span id="upload-speed">-</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Initialize Charts
+      let resourceChart, networkChart, downloadData, uploadData;
+
+      // Fetch data from API
+      const apiBase = window.apiBase;
+
+      console.log("API Base URL:", apiBase);
+
+      // Coordinates for weather location
+      const lat = 0;
+      const lon = 0;
+
+      // Update date
+      function updateDate() {
+        const now = new Date();
+        document.getElementById("date").textContent = now.toLocaleDateString(
+          undefined,
+          {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          },
+        );
+      }
+
+      // Update clock
+      function updateClock() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes().toString().padStart(2, "0");
+        const seconds = now.getSeconds().toString().padStart(2, "0");
+        const ampm = hours >= 12 ? "PM" : "AM";
+        const hour12 = hours % 12 || 12;
+        document.getElementById("clock").textContent =
+          `${hour12}:${minutes}:${seconds} ${ampm}`;
+      }
+
+      // Get weather icon and description based on weather code
+      function getWeatherIcon(code) {
+        if (code < 3)
+          return "https://img.icons8.com/fluency/48/partly-cloudy-day.png";
+        if (code < 45) return "https://img.icons8.com/fluency/48/cloud.png";
+        if (code < 60) return "https://img.icons8.com/fluency/48/rain.png";
+        return "https://img.icons8.com/fluency/48/storm.png";
+      }
+
+      // Get weather description based on weather code
+      function getWeatherDescription(code) {
+        const descriptions = {
+          0: "Clear sky",
+          1: "Partly cloudy",
+          2: "Cloudy",
+          3: "Overcast",
+          45: "Fog",
+          48: "Fog with frost",
+          51: "Light drizzle",
+          53: "Moderate drizzle",
+          55: "Heavy drizzle",
+          61: "Light rain",
+          63: "Moderate rain",
+          65: "Heavy rain",
+          66: "Light freezing rain",
+          67: "Heavy freezing rain",
+          71: "Light snowfall",
+          73: "Moderate snowfall",
+          75: "Heavy snowfall",
+          80: "Brief heavy rain",
+          81: "Heavy rain showers",
+          82: "Very heavy rain showers",
+          95: "Thunderstorm",
+          96: "Thunderstorm with light hail",
+          99: "Thunderstorm with heavy hail",
+        };
+        return descriptions[code] || "Unknown weather condition";
+      }
+
+      // Update dashboard data
+      function updateDashboard() {
+        fetch(`${apiBase}/api/system_info`)
+          .then((res) => res.json())
+          .then((data) => {
+            // System Info
+            document.getElementById("kernel-info").textContent =
+              `${data.kernel_info.system_name} ${data.kernel_info.kernel_version} (${data.kernel_info.machine})`;
+            document.getElementById("uptime").textContent =
+              `${data.system_uptime.uptime}`;
+
+            // Battery
+            const battery = data.battery_info;
+            const time_left = battery.battery_time_left;
+            document.getElementById("battery-text").textContent =
+              `${battery.battery_percentage.toFixed(1)}%`;
+            document.getElementById("battery-status").textContent =
+              battery.power_plugged_in
+                ? "Charging"
+                : `${time_left.hours}:${time_left.minutes} to discharge`;
+
+            document.getElementById("battery-fill").style.width =
+              `${battery.battery_percentage}%`;
+
+            // Change battery fill color based on percentage
+            const fill = document.getElementById("battery-fill");
+            const percent = battery.battery_percentage;
+            fill.style.backgroundColor =
+              percent > 60 ? "#00ff5e" : percent > 30 ? "#ffc107" : "#dc3545";
+
+            // Resources
+            const cpuPercent = data.cpu_info.total_cpu_usage;
+            const ramPercent = data.memory_info.memory_percentage;
+            const swapPercent = data.swap_info.swap_percentage;
+
+            resourceChart.data.datasets[0].data = [
+              swapPercent,
+              100 - swapPercent,
+            ];
+            resourceChart.data.datasets[1].data = [
+              ramPercent,
+              100 - ramPercent,
+            ];
+            resourceChart.data.datasets[2].data = [
+              cpuPercent,
+              100 - cpuPercent,
+            ];
+            resourceChart.options.elements.center.text = `${cpuPercent.toFixed(1)}%`;
+            resourceChart.options.elements.centerSmall.text = `${ramPercent.toFixed(1)}%`;
+            resourceChart.options.elements.centerSmallBottom.text = `${swapPercent.toFixed(1)}%`;
+            resourceChart.update();
+
+            document.getElementById("ram-usage-total").textContent =
+              `${data.memory_info.used_memory.toFixed(1)} GB / ${data.memory_info.total_memory.toFixed(1)} GB`;
+            document.getElementById("swap-usage-total").textContent =
+              `${data.swap_info.used_swap.toFixed(1)} GB / ${data.swap_info.total_swap.toFixed(1)} GB`;
+            document.getElementById("disk-free-total").textContent =
+              `${data.disk_info["/"].free_space.toFixed(1)} GB / ${data.disk_info["/"].total_space.toFixed(1)} GB`;
+
+            // Processes
+            const processTable = document.querySelector("#process-table tbody");
+            processTable.innerHTML = "";
+            data.process_info.forEach((proc) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+    <td>${proc.name}</td>
+    <td class="text-center">${proc.pid}</td>
+    <td class="text-center">${proc.cpu_percent.toFixed(1)}</td>
+    <td class="text-center">${proc.memory_percent.toFixed(1)}</td>
+  `;
+              processTable.appendChild(row);
+            });
+
+            // Network
+            document.getElementById("download-speed").textContent =
+              `${data.network_speed.download_speed_kb} KB/s`;
+            document.getElementById("upload-speed").textContent =
+              `${data.network_speed.upload_speed_kb} KB/s`;
+
+            const down = data.network_speed.download_speed_kb;
+            const up = data.network_speed.upload_speed_kb;
+
+            // Push new data to the network chart
+            downloadData.shift();
+            uploadData.shift();
+            downloadData.push(down);
+            uploadData.push(up);
+
+            networkChart.update();
+          });
+      }
+
+      $(document).ready(function () {
+        // Update Date
+        setInterval(updateDate, 1000);
+
+        // Update Clock
+        setInterval(updateClock, 1000);
+
+        // Setup center text plugin for Chart.js
+        Chart.register({
+          id: "centerText",
+          beforeDraw: function (chart) {
+            if (chart.config.options.elements?.center) {
+              const ctx = chart.ctx;
+              const centerConfig = chart.config.options.elements.center;
+              const fontSize = centerConfig.fontSize || "16";
+              const text = centerConfig.text;
+              const color = centerConfig.color || "#fff";
+              const fontStyle = centerConfig.fontStyle || "normal";
+              const fontFamily = centerConfig.fontFamily || "Segoe UI";
+              const x = chart.chartArea.left + chart.chartArea.width / 2;
+              const y = chart.chartArea.top + chart.chartArea.height / 1.7;
+
+              ctx.save();
+              ctx.font = `${fontStyle} ${fontSize}px ${fontFamily}`;
+              ctx.fillStyle = color;
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.fillText(text, x, y);
+              ctx.restore();
+            }
+            if (chart.config.options.elements?.centerSmall) {
+              const ctx = chart.ctx;
+              const centerConfig = chart.config.options.elements.centerSmall;
+              const fontSize = centerConfig.fontSize || "16";
+              const text = centerConfig.text;
+              const color = centerConfig.color || "#fff";
+              const fontStyle = centerConfig.fontStyle || "normal";
+              const fontFamily = centerConfig.fontFamily || "Segoe UI";
+              const x = chart.chartArea.left + chart.chartArea.width / 2;
+              const y = chart.chartArea.top + chart.chartArea.height / 1.3;
+
+              ctx.save();
+              ctx.font = `${fontStyle} ${fontSize}px ${fontFamily}`;
+              ctx.fillStyle = color;
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.fillText(text, x, y);
+              ctx.restore();
+            }
+            if (chart.config.options.elements?.centerSmallBottom) {
+              const ctx = chart.ctx;
+              const centerConfig =
+                chart.config.options.elements.centerSmallBottom;
+              const fontSize = centerConfig.fontSize || "16";
+              const text = centerConfig.text;
+              const color = centerConfig.color || "#fff";
+              const fontStyle = centerConfig.fontStyle || "normal";
+              const fontFamily = centerConfig.fontFamily || "Segoe UI";
+              const x = chart.chartArea.left + chart.chartArea.width / 2;
+              const y = chart.chartArea.top + chart.chartArea.height / 1.1;
+
+              ctx.save();
+              ctx.font = `${fontStyle} ${fontSize}px ${fontFamily}`;
+              ctx.fillStyle = color;
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.fillText(text, x, y);
+              ctx.restore();
+            }
+          },
+        });
+
+        // Initialize Resource Chart
+        resourceChart = new Chart(
+          document.getElementById("resource-usage-arc"),
+          {
+            type: "doughnut",
+            data: {
+              labels: ["used", "idle"],
+              datasets: [
+                {
+                  data: [0, 100],
+                  backgroundColor: ["#4635B1", "#343a40"],
+                  borderWidth: 0,
+                  borderRadius: {
+                    outerStart: [50, 0],
+                    outerEnd: [0, 50],
+                    innerStart: [50, 0],
+                    innerEnd: [0, 50],
+                  },
+                  weight: 0.7,
+                },
+                {
+                  data: [0, 100],
+                  backgroundColor: ["#FF0B55", "#343a40"],
+                  borderWidth: 0,
+                  borderRadius: {
+                    outerStart: [50, 0],
+                    outerEnd: [0, 50],
+                    innerStart: [50, 0],
+                    innerEnd: [0, 50],
+                  },
+                  weight: 1,
+                },
+                {
+                  data: [0, 100],
+                  backgroundColor: ["#00FF9C", "#343a40"],
+                  borderWidth: 0,
+                  borderRadius: {
+                    outerStart: [50, 0],
+                    outerEnd: [0, 50],
+                    innerStart: [50, 0],
+                    innerEnd: [0, 50],
+                  },
+                  weight: 1.5,
+                },
+              ],
+            },
+            options: {
+              rotation: -135,
+              circumference: 270,
+              cutout: ["80%", "60%", "50%"],
+              responsive: true,
+              plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true },
+              },
+              elements: {
+                center: {
+                  text: "0%",
+                  fontSize: 48,
+                  color: "#fff",
+                  fontStyle: "normal",
+                },
+                centerSmall: {
+                  text: "0%",
+                  fontSize: 24,
+                  color: "#fff",
+                  fontStyle: "normal",
+                },
+                centerSmallBottom: {
+                  text: "0%",
+                  fontSize: 18,
+                  color: "#fff",
+                  fontStyle: "normal",
+                },
+              },
+            },
+          },
+        );
+
+        // Initialize Network Data
+        const networkLabels = Array.from({ length: 60 }, (_, i) => `${i}s ago`);
+
+        downloadData = Array(60).fill(null);
+        uploadData = Array(60).fill(null);
+
+        // Initialize Network Chart
+        networkChart = new Chart(document.getElementById("network-history"), {
+          type: "line",
+          data: {
+            labels: networkLabels,
+            datasets: [
+              {
+                label: "Download (KB/s)",
+                data: downloadData,
+                borderColor: "#4CCD99",
+                fill: true,
+                tension: 0.3,
+                pointRadius: 1,
+              },
+              {
+                label: "Upload (KB/s)",
+                data: uploadData,
+                borderColor: "#FFC700",
+                fill: true,
+                tension: 0.3,
+                pointRadius: 1,
+              },
+            ],
+          },
+          options: {
+            animation: {
+              duration: 300,
+            },
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "KB/s",
+                },
+              },
+              x: {
+                display: false,
+              },
+            },
+            plugins: {
+              legend: {
+                display: false,
+                labels: {
+                  color: "#ccc",
+                },
+              },
+            },
+          },
+        });
+
+        // Fetch Weather Data
+        fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode`,
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            const description = getWeatherDescription(data.current.weathercode);
+            const weatherText = `${description}, ${data.current.temperature_2m}°C`;
+            const icon = getWeatherIcon(data.current.weathercode);
+            document.getElementById("weather-text").textContent = weatherText;
+            const iconEl = document.getElementById("weather-icon");
+            iconEl.src = icon;
+            iconEl.style.display = "inline-block";
+          });
+
+        // Fetch Location Name using OpenStreetMap Nominatim
+        fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+        )
+          .then((res) => res.json())
+          .then((location) => {
+            const city =
+              location.address.city ||
+              location.address.town ||
+              location.address.village ||
+              location.address.county;
+            document.getElementById("weather-location").textContent =
+              city || "Location not found";
+          });
+
+        // Update Dashboard
+        setInterval(updateDashboard, 5000);
+      });
+    </script>
+  </body>
+</html>
