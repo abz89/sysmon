@@ -94,7 +94,7 @@ Then open: [http://localhost:8000](http://localhost:8000)
 └── LICENSE
 ├── media/
 │   ├── preview.png
-└── README.md					# this document
+└── README.md				# this document
 ├── requirements.txt     		# Python dependencies
 ├── static/
 │   ├── index.html       		# Main dashboard UI
