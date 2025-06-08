@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template_string, request
 from flask_cors import CORS
 import os
+import platform
 import psutil
 import time
 import argparse
@@ -12,12 +13,22 @@ STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 # inspired from https://umeey.medium.com/system-monitoring-made-easy-with-pythons-psutil-library-4b9add95a443
 
 def get_kernel_info():
-    return {
-        "kernel_version": os.uname().release,
-        "system_name": os.uname().sysname,
-        "node_name": os.uname().nodename,
-        "machine": os.uname().machine
-    }
+    if hasattr(os, 'uname'):
+        uname = os.uname()
+        return {
+            "kernel_version": uname.release,
+            "system_name": uname.sysname,
+            "node_name": uname.nodename,
+            "machine": uname.machine
+        }
+    else:
+        uname = platform.uname()
+        return {
+            "kernel_version": uname.release,
+            "system_name": uname.system,
+            "node_name": uname.node,
+            "machine": uname.machine
+        }
 
 
 def get_memory_info():
@@ -140,7 +151,8 @@ def get_process_info():
             })
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
-    filtered = [p for p in process_info if p["cpu_percent"] is not None and p["memory_percent"] is not None]
+    filtered = [p for p in process_info if p["cpu_percent"]
+                is not None and p["memory_percent"] is not None]
     return sorted(filtered, key=lambda p: p["cpu_percent"], reverse=True)[:5]
 
 
@@ -304,4 +316,4 @@ if __name__ == '__main__':
         def serve_index_combined():
             return fe_app.view_functions['serve_index']()
 
-    app.run(host='0.0.0', port=args.port,)
+    app.run(host='0.0.0.0', port=args.port,)
