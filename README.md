@@ -47,6 +47,7 @@ source venv/bin/activate  # Activate the virtual environment
 
 ```bash
 python -m venv venv  # Create virtual environment
+Set-ExecutionPolicy Unrestricted -Scope Process # If needed
 .\venv\Scripts\activate  # Activate the virtual environment
 ```
 
