@@ -483,9 +483,9 @@
 
             // Network
             document.getElementById("download-speed").textContent =
-              `${data.network_speed.download_speed_kb} KB/s`;
+              `${data.network_speed.download_speed_kb.toFixed(0)} KB/s`;
             document.getElementById("upload-speed").textContent =
-              `${data.network_speed.upload_speed_kb} KB/s`;
+              `${data.network_speed.upload_speed_kb.toFixed(0)} KB/s`;
 
             const down = data.network_speed.download_speed_kb;
             const up = data.network_speed.upload_speed_kb;
