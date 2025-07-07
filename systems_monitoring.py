@@ -5,7 +5,53 @@ import platform
 import psutil
 import time
 import argparse
+import configparser
+from pathlib import Path
 
+
+# Configuration Management
+CONFIG_PATH = Path("config.ini")
+
+
+def ensure_config_exists():
+    """Ensure that the config.ini file exists with default values if it does not."""
+
+    if not CONFIG_PATH.exists():
+        config = configparser.ConfigParser()
+        config["general"] = {
+            "mode": "both",
+            "port": "8000"
+        }
+        config["api"] = {
+            "host": "localhost",
+            "port": "8000"
+        }
+        config["location"] = {
+            "lat": "-6.1944",
+            "lon": "106.8229"
+        }
+        with open(CONFIG_PATH, "w") as configfile:
+            config.write(configfile)
+        print("[INFO] config.ini generated with default values.")
+
+
+# Ensure the static directory exists
+ensure_config_exists()
+
+# Read configuration from config.ini
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+# Read configuration values
+MODE = config.get("general", "mode", fallback="both")
+PORT = config.getint("general", "port", fallback=8000)
+API_HOST = config.get("api", "host", fallback="localhost")
+API_PORT = config.getint("api", "port", fallback=8000)
+LAT = config.get("location", "lat", fallback="-6.1944")
+LON = config.get("location", "lon", fallback="106.8229")
+
+
+# Define the static directory path
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 
 
@@ -13,6 +59,8 @@ STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 # inspired from https://umeey.medium.com/system-monitoring-made-easy-with-pythons-psutil-library-4b9add95a443
 
 def get_kernel_info():
+    """Get kernel information including version, system name, node name, and machine type."""
+
     if hasattr(os, 'uname'):
         uname = os.uname()
         return {
@@ -32,6 +80,8 @@ def get_kernel_info():
 
 
 def get_memory_info():
+    """Get memory information including total, available, used memory and percentage usage."""
+
     return {
         "total_memory": psutil.virtual_memory().total / (1024.0 ** 3),
         "available_memory": psutil.virtual_memory().available / (1024.0 ** 3),
@@ -41,6 +91,8 @@ def get_memory_info():
 
 
 def get_swap_info():
+    """Get swap memory information including total, available, used swap and percentage usage."""
+
     swap = psutil.swap_memory()
 
     return {
@@ -54,6 +106,8 @@ def get_swap_info():
 
 
 def get_cpu_info():
+    """Get CPU information including physical cores, total cores, processor speed, and CPU usage per core."""
+
     try:
         cpu_freq = psutil.cpu_freq()
         processor_speed = cpu_freq.current if cpu_freq else None
@@ -70,6 +124,8 @@ def get_cpu_info():
 
 
 def get_disk_info_():
+    """Get disk information including total, used, free space and usage percentage for each partition."""
+
     partitions = psutil.disk_partitions()
     disk_info = {}
     for partition in partitions:
@@ -84,6 +140,8 @@ def get_disk_info_():
 
 
 def get_disk_info():
+    """Get disk information including total, used, free space and usage percentage for the root partition."""
+
     try:
         path = '/' if platform.system().lower() != 'windows' else 'C:\\'
         usage = psutil.disk_usage(path)
@@ -104,6 +162,8 @@ def get_disk_info():
 
 
 def get_network_info():
+    """Get network information including bytes sent and received."""
+
     net_io_counters = psutil.net_io_counters()
     return {
         "bytes_sent": net_io_counters.bytes_sent,
@@ -112,6 +172,8 @@ def get_network_info():
 
 
 def get_network_speed(interval=1):
+    """Get network upload and download speed in bytes and kilobytes over a specified interval."""
+
     # get initial network statistics
     net_io_before = psutil.net_io_counters()
     bytes_sent_before = net_io_before.bytes_sent  # upload
@@ -141,6 +203,8 @@ def get_network_speed(interval=1):
 
 
 def get_process_info():
+    """Get information about running processes including PID, name, memory usage, and CPU usage."""
+
     process_info = []
     for process in psutil.process_iter(['pid', 'name', 'memory_percent', 'cpu_percent']):
         try:
@@ -165,6 +229,8 @@ def get_process_info():
 
 
 def get_load_average():
+    """Get system load averages for the last 1, 5, and 15 minutes."""
+
     load_avg_1, load_avg_5, load_avg_15 = psutil.getloadavg()
     return {
         "load_average_1": load_avg_1,
@@ -174,6 +240,8 @@ def get_load_average():
 
 
 def get_disk_io_counters():
+    """Get disk I/O counters including read and write counts, bytes, and time."""
+
     io_counters = psutil.disk_io_counters()
     if io_counters is None:
         return {
@@ -196,6 +264,8 @@ def get_disk_io_counters():
 
 
 def get_net_io_counters():
+    """Get network I/O counters including bytes sent and received, packets sent and received, errors, and drops."""
+
     io_counters = psutil.net_io_counters()
     return {
         "bytes_sent": io_counters.bytes_sent,
@@ -210,6 +280,8 @@ def get_net_io_counters():
 
 
 def get_system_uptime():
+    """Get system uptime in a human-readable format."""
+
     boot_time_timestamp = psutil.boot_time()
     current_time_timestamp = time.time()
     uptime_seconds = current_time_timestamp - boot_time_timestamp
@@ -221,6 +293,8 @@ def get_system_uptime():
 
 
 def get_battery_info():
+    """Get battery information including percentage, charging status, and estimated time left."""
+
     battery = psutil.sensors_battery()
     battery_data = {}
 
@@ -245,11 +319,14 @@ def get_battery_info():
 
 def create_api_app():
     """Create a Flask app for the API endpoints."""
+
     app = Flask(__name__)
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     @app.route('/api/system_info', methods=['GET'])
     def system_info():
+        """API endpoint to get system information including kernel, memory, CPU, disk, network, and process info."""
+
         return jsonify({
             "kernel_info": get_kernel_info(),
             "memory_info": get_memory_info(),
@@ -271,13 +348,22 @@ def create_api_app():
 
 def create_frontend_app(api_base_url):
     """Create a Flask app for serving the frontend."""
+
     app = Flask(__name__, static_folder=STATIC_DIR)
 
     @app.route('/')
     def serve_index():
+        """Serve the index.html file with injected API base URL and location coordinates."""
+
         with open(os.path.join(STATIC_DIR, 'index.html')) as f:
             html_content = f.read()
-        injected = f"<script>window.apiBase = '{api_base_url}';</script>"
+        injected = f"""
+        <script>
+            window.apiBase = '{api_base_url}';
+            window.lat = '{LAT}';
+            window.lon = '{LON}';
+        </script>
+        """
         return render_template_string(injected + html_content)
 
     return app
@@ -285,6 +371,7 @@ def create_frontend_app(api_base_url):
 
 # Main entry point
 if __name__ == '__main__':
+    """Main function to parse arguments and run the appropriate mode (API, Frontend, or both)."""
     parser = argparse.ArgumentParser(
         description='System Monitoring Dashboard',
         epilog='Usages:\n'
@@ -320,6 +407,9 @@ if __name__ == '__main__':
 
         @app.route('/')
         def serve_index_combined():
+            """Serve the index page from the frontend app when both API and Frontend modes are selected."""
+
             return fe_app.view_functions['serve_index']()
 
+    # Run the app
     app.run(host='0.0.0.0', port=args.port,)

@@ -5,16 +5,18 @@ A lightweight, modern and responsive system monitoring dashboard (inspired by Tu
 - 🐍 Python (`psutil`, `Flask`)
 - 📊 Chart.js for visualizing CPU, RAM, SWAP, network and battery data
 - ☁️ Weather & time widgets
-- 🌐 Web-based frontend, runs on any modern browser
+- 🌐 Web-based front-end, runs on any modern browser
+- ⚙️ Fully configurable via `config.ini`
 
 ## 🚀 Features
 
 - **Real-time system metrics**: CPU usage, memory, disk, swap, battery, uptime
 - **Beautiful charts**: Radial usage charts and network history line graphs
 - **Weather integration** using [Open-Meteo](https://open-meteo.com/)
-- **Auto-refreshing UI** every 5 seconds
+- **Auto-refreshing UI**
 - **Responsive dark mode layout**
-- **Portable**: Runs on macOS (tested), Linux (not tested yet), Raspberry Pi (not tested yet) & Windows (not tested yet)
+- **Flexible mode**: run API only, front-end only, or both
+- **Portable**: Runs on macOS (tested), Linux (tested), Raspberry Pi (tested) & Windows (tested)
 
 ## 🖥️ Preview
 
@@ -85,21 +87,37 @@ Then open: [http://localhost:8000](http://localhost:8000)
 
 ## ⚙️ Configuration
 
-- Weather location is hardcoded via latitude & longitude. You can edit it in `index.html`
-- Chart update interval can be changed via `setInterval()` in JS
-- Responsive layout based on Bootstrap 5 grid
+On first run, a `config.ini` file will be automatically created.
+You can manually or programmatically edit:
+
+```ini
+[general]
+mode = both
+port = 8000
+
+[api]
+host = localhost
+port = 8000
+
+[location]
+lat = -6.8705552
+lon = 107.5461454
+
+```
 
 ## 📁 File Structure
 
 ```
-└── LICENSE
-├── media/
-│   ├── preview.png
-└── README.md				# this document
-├── requirements.txt     		# Python dependencies
+.
+├── LICENSE
+├── README.md                 # this document
+├── config.ini                # Auto-generated on first run
+├── requirements.txt
 ├── static/
-│   ├── index.html       		# Main dashboard UI
-├── systems_monitoring.py		# Backend API server using Flask
+│   └── index.html            # Web UI
+├── systems_monitoring.py     # Flask app (API + frontend)
+└── media/
+    └── preview.png
 ```
 
 ## 📜 License
@@ -116,3 +134,4 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 - [Chart.js](https://www.chartjs.org/)
 - [Bootstrap 5](https://getbootstrap.com/)
 - [Open-Meteo](https://open-meteo.com/)
+- [Icons8](https://icons8.com/) – for modern UI icons
