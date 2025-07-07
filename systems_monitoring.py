@@ -43,10 +43,10 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 # Read configuration values
-MODE = config.get("general", "mode", fallback="both")
-PORT = config.getint("general", "port", fallback=8000)
-API_HOST = config.get("api", "host", fallback="localhost")
-API_PORT = config.getint("api", "port", fallback=8000)
+DEFAULT_MODE = config.get("general", "mode", fallback="both")
+DEFAULT_PORT = config.getint("general", "port", fallback=8000)
+DEFAULT_API_HOST = config.get("api", "host", fallback="localhost")
+DEFAULT_API_PORT = config.getint("api", "port", fallback=8000)
 LAT = config.get("location", "lat", fallback="-6.1944")
 LON = config.get("location", "lon", fallback="106.8229")
 
@@ -381,12 +381,12 @@ if __name__ == '__main__':
         formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument('--mode', choices=['api', 'frontend', 'both'],
-                        default='both', help='Mode to run: API/Frontend/both')
-    parser.add_argument('--port', type=int, default=8000,
+                        default=DEFAULT_MODE, help='Mode to run: API/Frontend/both')
+    parser.add_argument('--port', type=int, default=DEFAULT_PORT,
                         help='Port to run the server on (default: 8000)')
-    parser.add_argument('--api-host', type=str,
+    parser.add_argument('--api-host', type=str, default=DEFAULT_API_HOST,
                         help='API hostname (used in --mode frontend)')
-    parser.add_argument('--api-port', type=int,
+    parser.add_argument('--api-port', type=int, default=DEFAULT_API_PORT,
                         help='API port (used in --mode frontend)')
     args = parser.parse_args()
 
