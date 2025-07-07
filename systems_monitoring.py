@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template_string, request
+from flask import Flask, jsonify, render_template_string
 from flask_cors import CORS
 import os
 import platform
@@ -85,7 +85,8 @@ def get_disk_info_():
 
 def get_disk_info():
     try:
-        usage = psutil.disk_usage('/')
+        path = '/' if platform.system().lower() != 'windows' else 'C:\\'
+        usage = psutil.disk_usage(path)
         total = usage.total
         free = usage.free
         used = total - free
@@ -143,9 +144,16 @@ def get_process_info():
     process_info = []
     for process in psutil.process_iter(['pid', 'name', 'memory_percent', 'cpu_percent']):
         try:
+            name = process.info['name']
+            pid = process.info['pid']
+
+            # Exclude "System Idle Process" (PID 0) and optionally "System" (PID 4)
+            if platform.system().lower() == 'windows' and (name.lower() == "system idle process" or pid == 0 or pid == 4):
+                continue
+
             process_info.append({
-                "pid": process.info['pid'],
-                "name": process.info['name'],
+                "pid": pid,
+                "name": name,
                 "memory_percent": process.info['memory_percent'],
                 "cpu_percent": process.info['cpu_percent']
             })
@@ -234,10 +242,9 @@ def get_battery_info():
 
     return battery_data
 
-# API App
-
 
 def create_api_app():
+    """Create a Flask app for the API endpoints."""
     app = Flask(__name__)
     CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -261,10 +268,9 @@ def create_api_app():
 
     return app
 
-# Frontend App
-
 
 def create_frontend_app(api_base_url):
+    """Create a Flask app for serving the frontend."""
     app = Flask(__name__, static_folder=STATIC_DIR)
 
     @app.route('/')
