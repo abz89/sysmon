@@ -492,15 +492,15 @@
     }
 
     $(document).ready(function () {
-      // Update Date every minute
-      setInterval(updateDate, 60000);
-
-      // Update Clock every second
-      setInterval(updateClock, 1000);
-
       // Initial update for location
+      updateDate();
       updateLocation();
       updateWeather();
+
+      // Update Date every minute
+      setInterval(updateDate, 60000);
+      // Update Clock every second
+      setInterval(updateClock, 1000);
 
       // Setup center text plugin for Chart.js
       Chart.register({
